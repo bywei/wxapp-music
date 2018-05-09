@@ -17,9 +17,9 @@
 感谢原作者：https://github.com/facejiong/light-music-wechat-mini-programs
 
 ## 修改后的演示
-![播放](./screenshot/2.jpg)
-![列表](./screenshot/4.jpg)
-![分享](./screenshot/5.jpg)
+![播放](./screenshot/1.jpg)
+![列表](./screenshot/2.jpg)
+![分享](./screenshot/3.jpg)
 
 #### 参与贡献
 
