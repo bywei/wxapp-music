@@ -17,15 +17,56 @@ Page({
     hasMore:true,
     loadHidden:true,
   },
-  onLoad: function () {
-    console.log('onLoad')
-    console.log(this.data.audioList.length)
+  onLoad: function (options) {
+    let that = this
+    console.log('onLoad params:' + options.name)
     //  获取本地存储存储audioIndex
     var audioIndexStorage = wx.getStorageSync('audioIndex')
-    console.log(audioIndexStorage)
-    if (audioIndexStorage) {
-      this.setData({audioIndex: audioIndexStorage}) 
+    var audioIndexNow = (audioIndexStorage && audioIndexStorage<that.data.audioList.length) ? audioIndexStorage : 0
+    this.setData({ audioIndex: audioIndexNow}) 
+    wx.setStorageSync('audioIndex', audioIndexNow)
+    console.log('默认的audioIndex:'+ this.data.audioIndex)
+    if (options.name !== undefined){
+      //检测本地是否存在歌曲
+      var exists = false
+      for (var i = 0; i < this.data.audioList.length; i++) {
+        if (that.data.audioList[i].name === options.name) {
+          console.log('exists share music')
+          audioIndexNow = i
+          that.setData({ audioIndex: audioIndexNow })
+          wx.setStorageSync('audioIndex', audioIndexNow)
+          exists = true
+          break;
+        }
+      }
+      if (!exists) { //不存在则加入分享歌曲
+        var shareData = [{ name: options.name, poster: options.poster, src: options.src, author: options.author}]
+        let updata = that.data.audioList.concat(shareData);
+        audioIndexNow = that.data.audioList.length
+        this.setData({
+          audioList: updata,
+          audioIndex: audioIndexNow,
+          sliderValue: 0,
+          currentPosition: 0,
+          duration: 0,
+          audioPalyStatus: 0,
+        })
+        console.log('不存在则加入分享歌曲:' + audioIndexNow)
+        wx.setStorageSync('audioIndex', audioIndexNow)
+      }
     }
+    
+    //自动播放下一首
+    // wx.onBackgroundAudioStop(function () {
+    //   that.bindTapNext()
+    // })
+    let nextTimer = setInterval(function () {
+      if (that.data.audioPalyStatus === 2) {
+        if (that.data.pauseStatus === false) {
+          that.bindTapNext()
+        }
+      }
+    }, 2000)
   },
   onReady: function (e) {
     console.log('onReady')
@@ -70,10 +111,11 @@ Page({
       sliderValue: 0,
       currentPosition: 0,
       duration:0, 
+      audioPalyStatus: 0,
     })
     let that = this
     setTimeout(() => {
-      if (that.data.pauseStatus === true) {
+      if (that.data.pauseStatus === false) {
         that.play()
       }
     }, 1000)
@@ -92,7 +134,7 @@ Page({
         console.log('pageSize:'+pageSize)
         console.log(app.globalData.userInfo)
         wx.request({
-          url: 'http://www.bywei.cn/upload/wukong/data.json',
+          url: 'https://www.bywei.cn/upload/wukong/data.json',
           data: {
             pageSize: pageSize,
             userInfo: JSON.stringify(app.globalData.userInfo)
@@ -129,8 +171,6 @@ Page({
         that.play()
       }
     }, 1000)
-    
-
     wx.setStorageSync('audioIndex', audioIndexNow)
   },
   bindTapPlay: function() {
@@ -175,17 +215,7 @@ Page({
     })
     let that = this
     let timer = setInterval(function() {
-      if (that.data.audioPalyStatus === 2) {
-        clearInterval(timer)
-        that.setData({ timer: '' })
-        setTimeout(() => {
-          if (that.data.pauseStatus === false) {
-            that.bindTapNext()
-          }
-        }, 1000)
-      } else {
         that.setDuration(that)
-      }
     }, 1000)
     this.setData({timer: timer})
   },
@@ -227,8 +257,12 @@ Page({
   },
   onShareAppMessage: function () {
     let that = this
+    let params = 'name=' + that.data.audioList[that.data.audioIndex].name
+    params += '&poster=' + that.data.audioList[that.data.audioIndex].poster
+    params += '&src=' + that.data.audioList[that.data.audioIndex].src
     return {
-      title: '悟空唱诗歌：' + that.data.audioList[that.data.audioIndex].name,
+      title: '我发现了早教学古诗《' + that.data.audioList[that.data.audioIndex].name + '》的好方法, 赶紧来！',
+      path: '/pages/index/index?author=&' + params, 
       success: function(res) {
         wx.showToast({
           title: '分享成功',
@@ -249,7 +283,7 @@ Page({
     var errorImgIndex = e.target.dataset.errorimg //获取循环的下标
     console.log("errorImgIndex:"+errorImgIndex)
     console.log("poster:" + this.data.audioList[errorImgIndex].poster)
-   this.data.audioList[errorImgIndex].poster = "https://w.chesudi.com/Public/web/img/onerrorcar.png"
+    this.data.audioList[errorImgIndex].poster = "https://file.bywei.cn/music/chuhe/cover.jpg"
   },
   scrollLoadMore: function (e) {
     let thats = this
@@ -261,7 +295,7 @@ Page({
     thats.setData({loadHidden: false});
 
     wx.request({
-      url: 'http://www.bywei.cn/upload/wukong/data.json',
+      url: 'https://www.bywei.cn/upload/wukong/data.json',
       data: {
         pageSize: pageSize,
         userInfo: JSON.stringify(app.globalData.userInfo)
@@ -279,6 +313,15 @@ Page({
         }
         thats.setData({ loadHidden: true });
         console.log("load up length end:" + thats.data.audioList.length)
+      }
+    })
+  },
+  goQuestion : function(e){
+    console.log('open webview page')
+    wx.navigateTo({
+      url: '../webview/index',
+      success: function (e) {
+        console.log(e)
       }
     })
   }

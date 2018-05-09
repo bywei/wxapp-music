@@ -1,0 +1,24 @@
+/*4*/
+.title-container{
+  position: absolute;
+  top: 20rpx;
+  height: 160rpx;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.title-left{
+  width: 80rpx;
+  height: 60rpx;
+  margin-left: 30rpx;
+}
+.text{
+  color: #fff;
+  text-align: left;
+  display: block;
+  width: 100%;
+  height: 60rpx;
+  margin-left:50rpx; 
+}

@@ -20,21 +20,25 @@
       <slider
           value="{{sliderValue}}"
           bindchange="bindSliderchange"
-          activeColor="#13beec"
+          activeColor="#454545"
           style="width: 62%;margin: 0;"
           block-size="12"
-          block-color="#13beec"
+          block-color="#454545"
         />
       <text class="slider-time">{{duration === 0 ? '00:00' : duration}}</text>
     </view>
     <view class="operation-container">
+    <view>
       <image src="../../assets/img/prev.png" class="icon-prev" bindtap="bindTapPrev"></image>
       <image
         src="{{pauseStatus === false ? '../../assets/img/pause.png' : '../../assets/img/play.png'}}"
         class="icon-play" bindtap="bindTapPlay"
         >
         </image>
-      <image src="../../assets/img/next.png" class="icon-next" bindtap="bindTapNext"></image>
+      <image src="../../assets/img/next.png" class="icon-next" bindtap="bindTapNext"></image></view>
+      <!--
+      <view class='question' bindtap='goQuestion'><text>问卷</text></view>
+      -->
     </view>
   </view>
   <!--第五层：列表页-->
@@ -52,7 +56,7 @@
         bindtap="bindTapChoose"
         >
         <view class="name">
-          <text class="list-index">{{index}}</text>
+          <text class="list-index">{{index + 1}}</text>
         </view>
         <view><image class="list-one-poster" src="{{item.poster}}"></image></view>
         <view class="list-one-right">
