@@ -1,0 +1,78 @@
+<!--index.wxml-->
+<view class="container">
+  <!--第一层层：背景图背景图，高斯模糊-->
+  <view class="bg">
+    <image class="poster" mode="scaleToFill" src="{{audioList[audioIndex].poster}}" binderror="binderrorimg" data-errorimg="{{audioIndex}}"></image>
+  </view>
+  <!--第二层层：灰色蒙层-->
+  <view class="bg-gray">
+  </view>
+  <!--第三层：player层-->
+  <view style="display: {{listShow === true ? 'none' : ''}}">
+    <!--旋转图-->
+    <view class="rotate-disk-container">
+      <view class="rotate-disk {{pauseStatus === false ? 'rotate-360' : 'rotate-360-paused'}}">
+        <image class="poster" src="{{audioList[audioIndex].poster}}" binderror="binderrorimg" data-errorimg="{{audioIndex}}"></image>
+      </view>
+    </view>
+    <view class="slider-container">
+      <text class="slider-time">{{currentPosition === 0 ? '00:00' : currentPosition}}</text>
+      <slider
+          value="{{sliderValue}}"
+          bindchange="bindSliderchange"
+          activeColor="#13beec"
+          style="width: 62%;margin: 0;"
+          block-size="12"
+          block-color="#13beec"
+        />
+      <text class="slider-time">{{duration === 0 ? '00:00' : duration}}</text>
+    </view>
+    <view class="operation-container">
+      <image src="../../assets/img/prev.png" class="icon-prev" bindtap="bindTapPrev"></image>
+      <image
+        src="{{pauseStatus === false ? '../../assets/img/pause.png' : '../../assets/img/play.png'}}"
+        class="icon-play" bindtap="bindTapPlay"
+        >
+        </image>
+      <image src="../../assets/img/next.png" class="icon-next" bindtap="bindTapNext"></image>
+    </view>
+  </view>
+  <!--第五层：列表页-->
+  <loading hidden="{{loadHidden}}" bindchange="loadingChange">
+    加载中...
+  </loading>  
+  <scroll-view class="list" bindscrolltolower="scrollLoadMore"
+     scroll-y="true" style="display: {{listShow === true ? '' : 'none'}}"
+    scroll-top="{{audioIndex * 68}}">
+     <view wx:for="{{audioList}}" wx:key="{{index}}">
+      <view
+        id="{{index}}"
+        class="list-one {{index === audioIndex ? 'list-one-choose' : ''}}"
+        hover-class="list-one-choose"
+        bindtap="bindTapChoose"
+        >
+        <view class="name">
+          <text class="list-index">{{index}}</text>
+        </view>
+        <view><image class="list-one-poster" src="{{item.poster}}"></image></view>
+        <view class="list-one-right">
+          <view class="list-name">{{item.name}}</view>
+          <!--<view class="author">歌手：{{item.author}}</view>-->
+        </view>
+      </view>
+     </view>
+     <view class="tips1" hidden="{{loadHidden}}">
+      <view wx:if="{{hasMore}}" style="display: flex;flex-direction: row;align-items: center;align-self: center;justify-content: center;">
+      <icon type="waiting" size="20"/><text>玩命的加载中...</text></view>
+      <view wx:else><text>没有更多内容了</text></view>
+    </view>
+  </scroll-view>
+  <!--<audio id="audio" src="{{audioList[audioIndex].src}}" style="display: none"></audio>-->
+  <!--导航操作-->
+  <view class="title-container">
+    <view class="title-left"><image src="../../assets/img/{{listShow === true ? 'back' : 'list'}}.png" class="icon-list" bindtap="bindTapList"></image></view>
+    <view class="text"><text class="name">{{audioList[audioIndex].name}}</text>
+      <!--<view><text class="author">-- {{audioList[audioIndex].author}} --</text></view>-->
+    </view>
+  </view>
+</view>
